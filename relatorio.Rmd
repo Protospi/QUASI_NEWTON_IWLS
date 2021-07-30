@@ -218,7 +218,7 @@ grid.raster(img)
 ```
 
 * Link do Aplicativo:
-  + [\textcolor{blue}{Optimizador IWLS}]()
+  + [\textcolor{blue}{Optimizador IWLS}](https://loes.shinyapps.io/QUASI_NEWTON_IWLS/)
 
 #### __Desenho__
 
@@ -241,7 +241,13 @@ grid.raster(img)
 * As caixas de valor da Deviance e da Distância Euclidiana dos vetores de betas mudam da cor verde para vermelho se a distância ou a Deviance são muito grandes.
 
 
+#### Referências e Links
 
+* [\textcolor{blue}{GLM Wikipedia}](https://en.wikipedia.org/wiki/Generalized_linear_model)
+
+* [\textcolor{blue}{Aplicativo Optimizador IWLS}](https://loes.shinyapps.io/QUASI_NEWTON_IWLS/)
+
+* [\textcolor{blue}{Projeto GitHub}](https://github.com/Protospi/QUASI_NEWTON_IWLS)
 
 
 
