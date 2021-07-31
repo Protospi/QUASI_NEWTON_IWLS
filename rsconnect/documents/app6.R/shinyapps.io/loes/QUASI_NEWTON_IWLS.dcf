@@ -5,10 +5,10 @@ account: loes
 server: shinyapps.io
 hostUrl: https://api.shinyapps.io/v1
 appId: 4440814
-bundleId: 4872902
+bundleId: 4875335
 url: https://loes.shinyapps.io/QUASI_NEWTON_IWLS/
-when: 1627666598.88736
-lastSyncTime: 1627666598.88736
+when: 1627749059.61102
+lastSyncTime: 1627749059.61102
 asMultiple: FALSE
 asStatic: FALSE
-ignoredFiles: app4.R|binomial.R|binomial_negativa.R|exponencial.R|iwls.py|LICENSE|normal.R|poisson.R|README.md|relatorio.pdf|relatorio.Rmd|simulacao_glm.py|www/imagens/87_iteracoes.png|www/imagens/iwls.png|www/imagens/optimization.png|imagens_relatorio
+ignoredFiles: app4.R|binomial.R|binomial_negativa.R|exponencial.R|iwls.py|LICENSE|normal.R|poisson.R|README.md|relatorio.pdf|relatorio.Rmd|simulacao_glm.py|imagens_relatorio

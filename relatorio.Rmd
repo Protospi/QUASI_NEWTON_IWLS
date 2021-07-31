@@ -1,7 +1,7 @@
 ---
 title: "Quasi - Newton"
 author: "Pedro Loes e Felipe Sadock"
-date: "7/28/2021"
+date: "31/07/2021"
 output: pdf_document
 ---
 
@@ -239,7 +239,6 @@ grid.raster(img)
 * A construção dos gráficos animados no formato gif gasta em torno de 20 a 30 segundos dependendo dos parâmetros escolhidos.
 
 * As caixas de valor da Deviance e da Distância Euclidiana dos vetores de betas mudam da cor verde para vermelho se a distância ou a Deviance são muito grandes.
-
 
 #### Referências e Links
 

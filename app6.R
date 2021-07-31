@@ -52,33 +52,13 @@ calcula_Z <- function(eta, Y){
 #Declara funcao theta
 calcula_theta <- function(eta, dist){
   
-  # Conficao de distribuicao
-  if(dist == "poisson"){
-    
     # Calcula theta poisson
     exp(eta)
-    
-  } else if(dist == "exp"){
-    
-    # Calcula theta gama
-    (-1 / eta)
-    
-  } else if(dist == "bin"){
-    
-    # Calcula theta binomial
-    exp(eta) / (1 + exp(eta))
-    
-  } else if(dist == "nbin"){
-    
-    # Calcula theta da normal
-    exp(eta)
-    
-  }
   
 }
 
 # Funcao estimativa de betas
-EMV <- function(Y, Xs, beta, tol, dist, norma){
+EMV <- function(Y, Xs, beta, tol, norma){
   
   # Declara betas
   betas <- tibble(iter = 1,
@@ -101,7 +81,7 @@ EMV <- function(Y, Xs, beta, tol, dist, norma){
     eta <- Xs %*% beta
     
     # Calcula media inicial
-    theta <- calcula_theta(eta, dist)
+    theta <- calcula_theta(eta)
     
     # Calcula diagonal da matriz Wi
     W_i <- calcula_W(eta, theta)
@@ -137,12 +117,6 @@ EMV <- function(Y, Xs, beta, tol, dist, norma){
   
 }
 
-# Declara dicionario de distribuicoes
-distribuicoes <- c("Poisson" = "poisson",
-                   "Exponêncial" = "exp",
-                   "Binomial" = "bin",
-                   "Binomial Negativa" = "nbin")
-
 # Declara função calcula da devinace
 calcula_deviance <- function(y, mu){
   
@@ -163,17 +137,13 @@ ui <- dashboardPage(
   
   # Cabecalho do aplicativo
   dashboardHeader(
-    title = span(
-      tags$img(src="imagens/optimizador_iwls.png", width = '100%'))
+    title = tags$img(src="imagens/optimizador_iwls4.png", width = '100%')
   ),
   
   # Declara barra lateral
   dashboardSidebar(
     
-    # Seletores de Entrada
-    selectInput("dist",
-                "Distribuição",
-                choices = c("Poisson" = "poisson")),
+    # Seletores de entrada do usuário
     sliderInput("obs",
                 "Número de Observações:",
                 min = 10,
@@ -181,30 +151,30 @@ ui <- dashboardPage(
                 value = 25),
     sliderInput("beta0_real",
                 "Beta 0 Real:",
-                min = 0,
-                max = 10,
+                min = 0.1,
+                max = 3,
                 value = 2,
                 step = 0.1),
     sliderInput("beta1_real",
                 "Beta 1 Real",
-                min = -10,
-                max = 10,
+                min = -5,
+                max = -0.1,
                 value = -2,
                 step = 0.1),
     actionButton(inputId = "amostre", 
                  label = "Amostrar",
-                 style="color: #fff; background-color: #008521; border-color: #2e6da4"),
+                 style="color: #fff; background-color: #f76f02; border-color: #2e6da4"),
     sliderInput("beta0",
                 "Beta 0 Inicial",
-                min = -10,
-                max = 10,
+                min = 0.01,
+                max = 5,
                 value = 1,
                 step = 0.1),
     sliderInput("beta1",
                 "Beta 1 Inicial",
-                min = -10,
-                max = 10,
-                value = 1,
+                min = -5,
+                max = -0.1,
+                value = -11,
                 step = 0.1),
     sliderInput("tol",
                 "Tolerância",
@@ -213,28 +183,25 @@ ui <- dashboardPage(
                 value = 0.1,
                 step = 0.01),
     actionButton(inputId = "optimize", 
-                 label = "Optimizar",
-                 style="color: #fff; background-color: #008521; border-color: #2e6da4")
+                 label = "Otimizar",
+                 style="color: #fff; background-color: #f76f02; border-color: #2e6da4")
     
   ),
   
   # Declara corpo do aplicativo
   dashboardBody(
+    HTML('<script> document.title = "Otimizador IWLS"; </script>'),
     # Define html style
     tags$style(".skin-blue .main-header .logo { background-color: #3e8fce; }
                 .skin-blue .main-header .logo:hover { background-color: #3e8fce;}
                 .skin-blue .main-header .navbar { background-color: #3e8fce;}"),
     fluidRow(
-      box(width = 12,
-          valueBoxOutput("dev"),
-          imageOutput("grafico1")
-          )
+      box(width = 6, imageOutput("grafico1")),
+      box(width = 6, imageOutput("grafico2"))
     ),
     fluidRow(
-      box(width = 12,
-          valueBoxOutput("dist"),
-          imageOutput("grafico2")
-          )
+      box(width = 6, valueBoxOutput("dev", width = 12)),
+      box(width = 6, valueBoxOutput("dist", width = 12))
     )
   )
   
@@ -270,6 +237,9 @@ server <- function(input, output, session){
     # Declara data frame
     amostra <- tibble(Y, X)
     
+    # Retorno da função
+    return(amostra)
+    
   })
   
   # Observa clique do botao optimizar
@@ -288,7 +258,7 @@ server <- function(input, output, session){
     beta0 = c(input$beta0, input$beta1)
     
     # Executa EMV
-    sol = EMV(Y, Xs, beta0, input$tol, dist = input$dist, 100) 
+    sol = EMV(Y, Xs, beta0, input$tol, 100) 
     
     # Define estados
     estados = paste0(rep(sol$iter, each = length(Y)),"    ",
@@ -322,10 +292,10 @@ server <- function(input, output, session){
     
     # Declara Data
     resultados <- df_anime %>% 
-                    bind_rows(original)
+                    rbind(original)
     
     # Retorno
-    return(list(resultados))
+    return(resultados)
     
   })
   
@@ -345,7 +315,7 @@ server <- function(input, output, session){
     beta0 = c(input$beta0, input$beta1)
     
     # Executa EMV
-    sol = EMV(Y, Xs, beta0, input$tol, dist = input$dist, 100) 
+    sol = EMV(Y, Xs, beta0, input$tol, 100) 
     
     # Calcula mu
     mu <- exp(sol$beta0[nrow(sol)] + sol$beta1[nrow(sol)] * X)
@@ -371,7 +341,6 @@ server <- function(input, output, session){
         color = "red",
         icon = icon("thermometer-half"))
       
-      
     } else {
       
       # Retorno da caixa de valor
@@ -380,8 +349,7 @@ server <- function(input, output, session){
         deviance(),
         color = "green",
         icon = icon("thermometer-half"))
-      
-      
+
     }
     
   })
@@ -390,13 +358,7 @@ server <- function(input, output, session){
   output$grafico1 <- renderImage({
     
     # Declara animacao
-    anime <- animacao1()[[1]]
-    
-    # Observa evento
-    distribuicao <- isolate(input$dist)
-    
-    # Recupera nome da distribuicao
-    nome <- names(distribuicoes[distribuicoes==distribuicao])
+    anime <- animacao1()
     
     # Declara objeto gráfico
     p <- anime %>%
@@ -404,7 +366,7 @@ server <- function(input, output, session){
       geom_point(size = 5) +
       scale_shape_manual(values=c(1, 20))+
       scale_colour_manual(values = c("red", "blue"))+
-      labs(title = paste0("Curva de Ajuste da Distribuição ", nome),
+      labs(title = "Curva de Ajuste da Distribuição Poisson",
            subtitle = paste("Iteração:  ","{closest_state}"),
            y = "Y")+
       transition_states(estados,
@@ -446,7 +408,7 @@ server <- function(input, output, session){
     beta0 = c(input$beta0, input$beta1)
     
     # Executa EMV
-    sol = EMV(Y, Xs, beta0, input$tol, dist = input$dist, 100) 
+    sol = EMV(Y, Xs, beta0, input$tol, 100) 
     
     # Declara betas 0 e betas 1
     betas0 <- seq(round(min(sol$beta0) -10),round(max(sol$beta0)+10),1)
@@ -459,7 +421,7 @@ server <- function(input, output, session){
                                 (beta1 - betas_reais[2])^2))
     
     # Retorno
-    return(list(sol,espaco))
+    return(list(sol, espaco, betas_reais))
     
   })
   
@@ -487,7 +449,7 @@ server <- function(input, output, session){
            x = "Beta 0",
            y = "Beta 1",
            fill = "Distância",
-           subtitle = paste("Tempo:  ","{frame_time}"))+
+           subtitle = paste("Frame:  ","{frame_time}"))+
       theme(panel.grid = element_blank(),
             panel.background = element_blank(),
             text = element_text(size=13))
@@ -509,9 +471,12 @@ server <- function(input, output, session){
     # Recupera solucao
     sol = animacao2()[[1]]
     
+    # Recupera Betas reais 
+    betas_reais <- animacao2()[[3]]
+    
     # Diferença de vetor de betas
-    dif_betas <- round(sqrt((sol$beta0[nrow(sol)] - input$beta0_real )^2 +
-                            (sol$beta1[nrow(sol)] - input$beta1_real )^2 ),
+    dif_betas <- round(sqrt((sol$beta0[nrow(sol)] - betas_reais[1] )^2 +
+                            (sol$beta1[nrow(sol)] - betas_reais[2] )^2 ),
                        4)
     
     # Condição de cor do termometro
@@ -522,7 +487,7 @@ server <- function(input, output, session){
         "Distância",
         dif_betas,
         color = "red",
-        icon = icon("thermometer-half"))
+        icon = icon("drafting-compass"))
       
       
     } else {
@@ -532,7 +497,7 @@ server <- function(input, output, session){
         "Distância",
         dif_betas,
         color = "green",
-        icon = icon("thermometer-half"))
+        icon = icon("drafting-compass"))
       
     }
     
